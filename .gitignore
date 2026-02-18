@@ -1,0 +1,31 @@
+# CLion / JetBrains
+.idea/
+cmake-build-*/
+
+# Build directories
+build/
+out/
+
+# Compiled objects
+*.o
+*.obj
+*.exe
+*.out
+*.a
+*.so
+*.dylib
+*.dll
+
+# Precompiled headers
+*.gch
+*.pch
+
+# CMake generated
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
+# OS files
+.DS_Store
+Thumbs.db
