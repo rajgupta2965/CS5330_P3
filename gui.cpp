@@ -86,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
     txtLog->setReadOnly(true);
     txtLog->setMaximumHeight(120);
     txtLog->setStyleSheet("QTextEdit { background-color: #1a1a2e; color: #eee; "
-                          "font-family: monospace; font-size: 12px; }");
+                          "font-family: 'Courier New', Courier; font-size: 12px; }");
 
     // ── Main layout ──
     QVBoxLayout *rightSide = new QVBoxLayout;
