@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
+#include <cmath>
 
 // ─── Union-Find helpers ────────────────────────────────────────────────────
 static int ufFind(std::vector<int> &parent, int x)
@@ -160,18 +161,46 @@ cv::Mat filterRegions(const cv::Mat &labelMap,
                       int minArea, bool removeBorder)
 {
     int rows = labelMap.rows, cols = labelMap.cols;
+    int imageArea = rows * cols;
+    double imgCx = cols / 2.0, imgCy = rows / 2.0;
+    double maxDist = std::sqrt(imgCx * imgCx + imgCy * imgCy);
 
     // Decide which old IDs survive
     std::unordered_map<int, int> oldToNew;
     filtered.clear();
     int newId = 0;
 
+    // Collect candidate regions
+    struct Candidate {
+        RegionStats stats;
+        double centrality; // 0 = center, 1 = corner
+    };
+    std::vector<Candidate> candidates;
+
     for (auto &rs : allStats) {
         if (rs.area < minArea) continue;
         if (removeBorder && rs.touchesBorder) continue;
+        // Skip regions larger than 40% of image (background clutter)
+        if (rs.area > imageArea * 0.4) continue;
+
+        double dx = rs.centroidX - imgCx;
+        double dy = rs.centroidY - imgCy;
+        double centrality = std::sqrt(dx * dx + dy * dy) / maxDist;
+        candidates.push_back({rs, centrality});
+    }
+
+    // Sort by centrality (most central first)
+    std::sort(candidates.begin(), candidates.end(),
+              [](const Candidate &a, const Candidate &b) {
+                  return a.centrality < b.centrality;
+              });
+
+    // Keep at most 5 most central regions
+    int maxRegions = std::min(5, (int)candidates.size());
+    for (int i = 0; i < maxRegions; i++) {
         newId++;
-        oldToNew[rs.id] = newId;
-        RegionStats ns = rs;
+        oldToNew[candidates[i].stats.id] = newId;
+        RegionStats ns = candidates[i].stats;
         ns.id = newId;
         filtered.push_back(ns);
     }
