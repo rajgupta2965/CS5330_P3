@@ -57,17 +57,17 @@ The GUI provides a more user-friendly way to use the system.
 | Key | Action |
 |-----|--------|
 | `q` | Quit |
-| `n` | Train — save hand-crafted features with a label |
-| `c` | Toggle continuous classification ON/OFF |
+| `0` | Toggle classification ON/OFF |
 | `1` / `2` / `3` | Classify with: Features / Eigenspace / CNN |
-| `g` | Ground-truth evaluation mode (for confusion matrix) |
-| `p` | Print confusion matrix |
-| `r` | Reset confusion matrix |
-| `w` | Save preprocessed ROI for eigenspace training |
-| `b` | Build eigenspace from saved ROIs |
-| `e` | Save CNN embedding for current object |
+| `4` | Train — save hand-crafted features with a label |
+| `5` | Save preprocessed ROI for eigenspace training |
+| `6` | Build eigenspace from saved ROIs |
+| `7` | Save CNN embedding for current object |
+| `8` | Ground-truth evaluation (for confusion matrix) |
+| `9` | Print confusion matrix |
 | `s` | Save screenshot |
-| `+` / `-` | Adjust threshold bias |
+| `+` / `=` | Increase threshold bias |
+| `-` | Decrease threshold bias |
 | `space` | Pause / resume |
 | `.` / `,` | Next / previous image (directory mode) |
 

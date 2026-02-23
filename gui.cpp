@@ -193,10 +193,10 @@ QGroupBox *MainWindow::createClassifyGroup()
     chkClassify = new QCheckBox("Classify continuously");
     chkClassify->setChecked(true);
 
-    btnTrainFeatures = new QPushButton("Train Features (n)");
-    btnTrainCNN      = new QPushButton("Train CNN Embed (e)");
-    btnSaveROI       = new QPushButton("Save ROI (w)");
-    btnBuildEigen    = new QPushButton("Build Eigenspace (b)");
+    btnTrainFeatures = new QPushButton("Train Features (4)");
+    btnTrainCNN      = new QPushButton("Train CNN Embed (7)");
+    btnSaveROI       = new QPushButton("Save ROI (5)");
+    btnBuildEigen    = new QPushButton("Build Eigenspace (6)");
 
     lay->addWidget(cmbMethod);
     lay->addWidget(chkClassify);
@@ -268,9 +268,9 @@ QGroupBox *MainWindow::createActionsGroup()
     auto *grp = new QGroupBox("Evaluation");
     auto *lay = new QVBoxLayout;
 
-    btnGroundTruth   = new QPushButton("Ground Truth (g)");
-    btnPrintConfusion = new QPushButton("Print Confusion Matrix (p)");
-    btnResetConfusion = new QPushButton("Reset Matrix (r)");
+    btnGroundTruth   = new QPushButton("Ground Truth (8)");
+    btnPrintConfusion = new QPushButton("Print Confusion Matrix (9)");
+    btnResetConfusion = new QPushButton("Reset Matrix");
     btnClearDB       = new QPushButton("Clear Training DB");
     btnScreenshot    = new QPushButton("Save Screenshot (s)");
 

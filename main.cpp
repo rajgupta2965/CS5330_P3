@@ -10,19 +10,19 @@
 
   Key bindings:
     q         quit
-    n         train: save current object's hand-crafted features with a label
-    c         toggle continuous classification
-    g         ground-truth mode: classify then prompt for true label (confusion matrix)
-    p         print confusion matrix
-    r         reset confusion matrix
-    w         save preprocessed ROI image for eigenspace training
-    b         build eigenspace from saved ROI directory
+    0         toggle continuous classification
     1         classify using hand-crafted features (default)
     2         classify using eigenspace embedding
     3         classify using CNN embedding
-    e         save CNN embedding for current object (training)
+    4         train: save current object's hand-crafted features with a label
+    5         save preprocessed ROI image for eigenspace training
+    6         build eigenspace from saved ROI directory
+    7         save CNN embedding for current object (training)
+    8         ground-truth mode: classify then prompt for true label (confusion matrix)
+    9         print confusion matrix
     s         save screenshot
-    +/-       adjust threshold bias
+    +/=       increase threshold bias
+    -         decrease threshold bias
     space     pause / resume video
     .  ,      next / previous image (directory mode)
 */
@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <iomanip>
+#include <chrono>
 #include <map>
 
 #include "opencv2/opencv.hpp"
@@ -203,13 +204,17 @@ cv::Mat prepROI(cv::Mat &frame, const RegionFeatures &feat)
 }
 
 // ─── Flush OpenCV key buffer after terminal input ──────────────────────────
-// When the user types in the terminal, OpenCV may also capture those
-// keystrokes.  Call this after every std::getline to consume stale keys.
+// On macOS, keystrokes can leak to both the terminal and OpenCV window.
+// This drains all buffered keys over a 500ms window to ensure none are left.
 void flushKeys()
 {
-    // consume any buffered key events
-    for (int i = 0; i < 20; i++)
+    auto start = std::chrono::steady_clock::now();
+    while (true) {
         cv::waitKey(1);
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - start).count();
+        if (elapsed > 500) break;
+    }
 }
 
 // ─── Usage ─────────────────────────────────────────────────────────────────
@@ -226,17 +231,17 @@ void printUsage(const char *prog)
       << "  " << prog << " -v <video>          video file\n"
       << "\nKey bindings:\n"
       << "  q       quit\n"
-      << "  n       train hand-crafted features\n"
-      << "  z       toggle continuous classification\n"
-      << "  g       ground-truth evaluation (confusion matrix)\n"
-      << "  p       print confusion matrix\n"
-      << "  r       reset confusion matrix\n"
-      << "  w       save preprocessed ROI for eigenspace\n"
-      << "  b       build eigenspace from saved ROIs\n"
-      << "  e       save CNN embedding (training)\n"
+      << "  0       toggle classification ON/OFF\n"
       << "  1/2/3   classify with: features / eigenspace / CNN\n"
+      << "  4       train hand-crafted features\n"
+      << "  5       save ROI for eigenspace\n"
+      << "  6       build eigenspace from saved ROIs\n"
+      << "  7       save CNN embedding\n"
+      << "  8       ground-truth evaluation (confusion matrix)\n"
+      << "  9       print confusion matrix\n"
       << "  s       save screenshot\n"
-      << "  +/-     adjust threshold bias\n"
+      << "  +/=     increase threshold bias\n"
+      << "  -       decrease threshold bias\n"
       << "  space   pause/resume\n"
       << "  . ,     next/prev image (directory mode)\n\n";
 }
@@ -407,12 +412,15 @@ int main(int argc, char *argv[])
         cv::imshow("Regions", res.regionColour);
 
         // ── Key handling ──
+        // All commands that require text input use NUMBER keys
+        // so they never conflict with typing labels in the terminal.
         int waitTime = (mode == WEBCAM || mode == VIDEO) ? 30 : 0;
         int key = cv::waitKey(waitTime) & 0xFF;
 
         if (key == 'q' || key == 27) break;
 
-        else if (key == 'n') {
+        else if (key == '4') {
+            // ── Train hand-crafted features ──
             if (res.regionFeatures.empty()) { std::cout << "No region.\n"; continue; }
             std::cout << "Label: "; std::string label; std::getline(std::cin, label);
             flushKeys();
@@ -424,7 +432,7 @@ int main(int argc, char *argv[])
                 std::cout << "DB: " << classifier.size() << " entries.\n";
             }
         }
-        else if (key == 'z') {
+        else if (key == '0') {
             classifyMode = !classifyMode;
             std::cout << "Classification " << (classifyMode ? "ON" : "OFF") << "\n";
         }
@@ -432,7 +440,8 @@ int main(int argc, char *argv[])
         else if (key == '2') { classMethod = 2; std::cout << "→ Eigenspace\n"; }
         else if (key == '3') { classMethod = 3; std::cout << "→ CNN embedding\n"; }
 
-        else if (key == 'g') {
+        else if (key == '8') {
+            // ── Ground truth evaluation ──
             if (res.regionFeatures.empty()) { std::cout << "No region.\n"; continue; }
             double dist; std::string predicted;
             if (classMethod == 1) {
@@ -456,10 +465,11 @@ int main(int argc, char *argv[])
             if (tl.empty()) tl = predicted;
             classifier.recordResult(tl, predicted);
         }
-        else if (key == 'p') { classifier.printConfusionMatrix(); }
-        else if (key == 'r') { classifier.resetConfusionMatrix(); }
+        else if (key == '9') { classifier.printConfusionMatrix(); }
+        // Note: to reset confusion matrix, restart the program
 
-        else if (key == 'w') {
+        else if (key == '5') {
+            // ── Save ROI for eigenspace ──
             if (res.regionFeatures.empty()) { std::cout << "No region.\n"; continue; }
             std::cout << "ROI label: "; std::string label; std::getline(std::cin, label);
             flushKeys();
@@ -473,12 +483,14 @@ int main(int argc, char *argv[])
                 cv::imshow("Saved ROI", roi);
             }
         }
-        else if (key == 'b') {
+        else if (key == '6') {
+            // ── Build eigenspace ──
             int n = eigenClassifier.buildFromDirectory(ROI_DIR);
             if (n > 0) eigenClassifier.save(EIGEN_PREFIX);
             else std::cout << "No images in " << ROI_DIR << "/\n";
         }
-        else if (key == 'e') {
+        else if (key == '7') {
+            // ── Save CNN embedding ──
             if (!hasDNN) { std::cout << "DNN not loaded.\n"; continue; }
             if (res.regionFeatures.empty()) { std::cout << "No region.\n"; continue; }
             std::cout << "CNN label: "; std::string label; std::getline(std::cin, label);
