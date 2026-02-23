@@ -24,7 +24,7 @@ int getEmbedding( cv::Mat &src, cv::Mat &embedding, cv::dnn::Net &net, int debug
   cv::Mat resized;
 
   cv::resize( src, resized, cv::Size( ORNet_size, ORNet_size ) );
-	
+
   cv::dnn::blobFromImage( resized, // input image
 			  blob, // output array
 			  (1.0/255.0) * (1/0.226), // scale factor
@@ -49,7 +49,7 @@ int getEmbedding( cv::Mat &src, cv::Mat &embedding, cv::dnn::Net &net, int debug
   Given the oriented bounding box information, extracts the region
   from the original image and rotates it so the primary axis is
   pointing right.
-  
+
   cv::Mat &frame - the original image
   cv::Mat &embimage - the resulting ROI
   int cx - the x coordinate of the centroid of the region
@@ -69,7 +69,7 @@ int getEmbedding( cv::Mat &src, cv::Mat &embedding, cv::dnn::Net &net, int debug
 
 
 void prepEmbeddingImage( cv::Mat &frame, cv::Mat &embimage, int cx, int cy, float theta, float minE1, float maxE1, float minE2, float maxE2, int debug ) {
-    
+
     // rotate the image to align the primary region with the x-axis
     cv::Mat rotatedImage;
     cv::Mat M;
@@ -118,9 +118,9 @@ void prepEmbeddingImage( cv::Mat &frame, cv::Mat &embimage, int cx, int cy, floa
     if(debug) {
       cv::imshow( "extracted", extractedImage );
     }
-    
+
     extractedImage.copyTo(embimage);
 
-    
+
     return;
 }
