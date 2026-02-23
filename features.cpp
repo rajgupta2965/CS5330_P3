@@ -188,10 +188,10 @@ void drawOrientedBB(cv::Mat &display, const RegionFeatures &feat,
     cv::line(display, p3, p4, bbColour, thickness);
     cv::line(display, p4, p1, bbColour, thickness);
 
-    // Primary axis line through centroid
-    double axLen = std::max(feat.maxE1 - feat.minE1, feat.maxE2 - feat.minE2) * 0.6;
-    cv::Point axStart(cvRound(cx - axLen * cosT), cvRound(cy - axLen * sinT));
-    cv::Point axEnd  (cvRound(cx + axLen * cosT), cvRound(cy + axLen * sinT));
+    // Primary axis line through centroid (length = extent along primary axis)
+    double axLen = (feat.maxE1 - feat.minE1) * 0.5;
+    cv::Point axStart(cvRound(cx + feat.minE1 * cosT), cvRound(cy + feat.minE1 * sinT));
+    cv::Point axEnd  (cvRound(cx + feat.maxE1 * cosT), cvRound(cy + feat.maxE1 * sinT));
     cv::line(display, axStart, axEnd, axColour, thickness);
 
     // Small circle at centroid
