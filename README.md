@@ -1,54 +1,65 @@
-# CS 5330 — Project 3: Real-time 2-D Object Recognition
+# Project 3: Real-time 2-D Object Recognition
 
-## Author
+## Team Members
+- **Sangeeth Deleep Menon** | NUID: 002524579 | MSCS - Boston | CS5330 Section 03 (CRN: 40669, Online)
+- **Raj Gupta** | NUID: 002068701 | MSCS - Boston | CS5330 Section 01 (CRN: 38745, Online)
 
-## Overview
-This project implements a complete 2-D object recognition pipeline that can
-identify objects placed on a white surface in a translation-, scale-, and
-rotation-invariant manner.  All four core stages are written **from scratch**
-(no OpenCV built-in thresholding, morphological ops, connected components, or
-moment functions).
+## Project Description
+This project implements a real-time 2-D object recognition system that identifies objects placed on a white surface in a translation-, scale-, and rotation-invariant manner. The system supports webcam, single image, image directory, and video input modes. All four core pipeline stages — thresholding, morphological filtering, connected components analysis, and moment/orientation computation — are written **from scratch** without using OpenCV built-in functions. Classification is performed using hand-crafted features (Hu moment invariants), eigenspace (PCA) embeddings, and CNN (ResNet18) embeddings.
 
-## OS / IDE
-- OS: [macOS / Windows / Linux]
-- IDE: CLion (CMake-based build)
-- Language: C++ 17
+## Building the Project
+This project uses CMake and requires OpenCV (with `dnn` module) and optionally Qt for the GUI. A C++17 compatible compiler is required.
+1.  **Navigate to the project directory.**
+2.  **Create a build directory and run CMake and make:**
+    ```bash
+    mkdir -p cmake-build-debug && cd cmake-build-debug
+    cmake ..
+    make
+    ```
+    This will create two executables inside the `cmake-build-debug` directory: `Project3` (command-line) and `Project3_GUI` (interactive GUI, requires Qt).
 
-## Dependencies
-- OpenCV 4.x (with `dnn` module for CNN embedding)
+## Running the Applications
 
-## Building
-```bash
-mkdir build && cd build
-cmake ..
-make -j$(nproc)       # Linux / macOS
-```
-Or simply open the project folder in CLion and build.
-
-## Running
+### Command-Line Application
+The executable supports several input modes:
 ```bash
 # Webcam mode (default)
-./object_recognition
+./cmake-build-debug/Project3
 
 # Single image
-./object_recognition -i path/to/image.png
+./cmake-build-debug/Project3 -i path/to/image.png
 
 # Directory of images
-./object_recognition -d Proj03Examples/
+./cmake-build-debug/Project3 -d Proj03Examples/
 
 # Video file
-./object_recognition -v recording.mp4
+./cmake-build-debug/Project3 -v recording.mp4
 ```
 
-## Key Bindings
+### GUI Application
+The GUI provides a more user-friendly way to use the system.
+1.  **Navigate to the project's root directory.**
+2.  **Execute the command:**
+    ```bash
+    ./cmake-build-debug/Project3_GUI
+    ```
+3.  **How to Use:**
+    *   Click **"Webcam"**, **"Open Image…"**, **"Open Directory…"**, or **"Open Video…"** to select an input source.
+    *   All four pipeline stages (thresholded, cleaned, regions, overlays) are displayed in tiled panels.
+    *   Select the classification method from the **dropdown** (Hand-crafted Features / Eigenspace / CNN).
+    *   Adjust pipeline parameters (threshold bias, morphology radii, min area, blur) using **sliders and spinboxes** — changes update in real time.
+    *   Click **"Train Features"**, **"Train CNN Embed"**, or **"Save ROI"** to add training data.
+    *   Click **"Build Eigenspace"** to construct the PCA space from saved ROIs.
+    *   Use **"Ground Truth"** to evaluate predictions and **"Print Confusion Matrix"** to view results.
+    *   A timestamped log panel at the bottom tracks all actions.
+
+### Key Bindings (Command-Line Application)
 | Key | Action |
 |-----|--------|
 | `q` | Quit |
-| `n` | **Train** — save hand-crafted features with a label |
+| `n` | Train — save hand-crafted features with a label |
 | `c` | Toggle continuous classification ON/OFF |
-| `1` | Classify using hand-crafted features (default) |
-| `2` | Classify using eigenspace (PCA) embedding |
-| `3` | Classify using CNN (ResNet18) embedding |
+| `1` / `2` / `3` | Classify with: Features / Eigenspace / CNN |
 | `g` | Ground-truth evaluation mode (for confusion matrix) |
 | `p` | Print confusion matrix |
 | `r` | Reset confusion matrix |
@@ -56,45 +67,59 @@ Or simply open the project folder in CLion and build.
 | `b` | Build eigenspace from saved ROIs |
 | `e` | Save CNN embedding for current object |
 | `s` | Save screenshot |
-| `+`/`-` | Adjust threshold bias |
+| `+` / `-` | Adjust threshold bias |
 | `space` | Pause / resume |
-| `.`/`,` | Next / previous image (directory mode) |
+| `.` / `,` | Next / previous image (directory mode) |
 
-## Workflow
+## Executable Files
+This project generates two main executable files, each with a specific role:
 
-### Hand-crafted features (Tasks 1–7)
-1. Run with webcam or images.
-2. Place an object; verify threshold / morphology / regions look good.
-3. Press `n` to label and save the feature vector.
-4. Repeat for all objects (≥ 5 categories, multiple orientations/positions).
-5. New objects are automatically classified in real time.
-6. Press `g` to record ground-truth for confusion matrix; press `p` to print it.
+1.  **`Project3` (Command-Line Interface - CLI)**
+    *   **Purpose**: The core application run directly from the terminal. It supports webcam, single image, directory, and video modes. Training, classification, and evaluation are controlled via key presses.
 
-### Eigenspace embedding (Task 9 — PCA option)
-1. Press `w` to save ROI images to `roi_training/` (repeat for each object).
-2. Press `b` to build the eigenspace from saved ROIs.
-3. Press `2` to switch to eigenspace classification.
+2.  **`Project3_GUI` (Graphical User Interface - GUI)**
+    *   **Purpose**: The interactive application with a full Qt desktop window. It provides buttons, dropdowns, sliders, and dialog boxes for all pipeline operations — no keyboard shortcuts needed. Includes a dark theme and live parameter adjustment.
 
-### CNN embedding (Task 9 — ResNet18 option)
-1. Place `or2d-normmodel-007.onnx` in the working directory.
-2. Press `e` to save a CNN embedding for the current object.
-3. Press `3` to switch to CNN classification.
+## Methods Overview
+| Task | Stage | Implementation |
+|------|-------|---------------|
+| 1. Thresholding | HSV saturation+value scoring | **From scratch** — ISODATA (K=2 k-means) adaptive threshold |
+| 2. Morphological Filtering | Closing → Opening cleanup | **From scratch** — Erosion/dilation with circular structuring element |
+| 3. Connected Components | Region segmentation | **From scratch** — Two-pass algorithm with union-find (8-connectivity) |
+| 4. Feature Computation | Moments, orientation, Hu invariants | **From scratch** — Raw/central/normalized moments, oriented bounding box |
+| 5–6. Training & Classification | Scaled Euclidean nearest-neighbour | CSV-based object DB with per-feature std dev normalization |
+| 7. Confusion Matrix | Performance evaluation | 5×5 matrix with accuracy reporting |
+| 9a. Eigenspace Embedding | PCA one-shot classification | SVD-based eigenspace build, project, SSD nearest-neighbour |
+| 9b. CNN Embedding | ResNet18 one-shot classification | ONNX model embedding, SSD nearest-neighbour |
 
-## Files
+## Project Files
 | File | Description |
 |------|-------------|
-| `main.cpp` | Main loop, key handling, display |
-| `thresholding.cpp/h` | **From scratch**: ISODATA adaptive thresholding |
-| `morphological.cpp/h` | **From scratch**: erosion, dilation, opening, closing |
-| `segmentation.cpp/h` | **From scratch**: two-pass connected components |
-| `features.cpp/h` | **From scratch**: moments, orientation, Hu invariants |
-| `classifier.cpp/h` | Scaled Euclidean nearest-neighbour classifier |
-| `eigenspace.cpp/h` | PCA eigenspace build + classify |
-| `utilities.cpp` | CNN embedding (ResNet18) — provided by instructor |
-| `vision.h` | Common structs |
+| `main.cpp` | CLI main loop, key handling, display |
+| `main_gui.cpp` | Qt application entry point with dark theme |
+| `gui.cpp` / `gui.h` | Qt GUI — panels, controls, parameter sliders, training dialogs |
+| `thresholding.cpp` / `thresholding.h` | **From scratch**: ISODATA adaptive thresholding |
+| `morphological.cpp` / `morphological.h` | **From scratch**: erosion, dilation, opening, closing |
+| `segmentation.cpp` / `segmentation.h` | **From scratch**: two-pass connected components with union-find |
+| `features.cpp` / `features.h` | **From scratch**: moments, orientation, Hu moment invariants, oriented BB |
+| `classifier.cpp` / `classifier.h` | Scaled Euclidean nearest-neighbour classifier, confusion matrix |
+| `eigenspace.cpp` / `eigenspace.h` | PCA eigenspace build, project, classify, save/load |
+| `utilities.cpp` | CNN embedding via ResNet18 — provided by instructor (Bruce Maxwell) |
+| `vision.h` | Common structs (RegionStats, RegionFeatures, TrainingEntry) |
+| `CMakeLists.txt` | Build configuration for both CLI and GUI targets |
+
+## Extensions
+- A full Qt desktop GUI was developed with tiled pipeline visualization, dropdown classification method selection, live parameter sliders, training/evaluation dialogs, and a timestamped log panel. The GUI provides a dark-themed, professional interface for all pipeline operations.
+- All four core pipeline stages (thresholding, morphological filtering, connected components, and moment/orientation computation) were written from scratch without using OpenCV built-in functions.
+- Both eigenspace (PCA) and CNN (ResNet18) embedding methods were implemented for one-shot classification (Task 9), with comparative evaluation.
 
 ## Time Travel Days
-[0 / specify if using any]
+0 days used.
 
-## Video Demo
+## Videos
 [Insert link to demo video]
+
+## Acknowledgements
+- OpenCV documentation for image I/O and DNN module references
+- Course materials and sample code provided by Prof. Bruce Maxwell (utilities.cpp, embedding.py, ResNet18 ONNX model)
+- An AI assistant (Claude) was used to help write and debug code, and for project documentation.
