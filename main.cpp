@@ -57,7 +57,7 @@ void prepEmbeddingImage(cv::Mat &frame, cv::Mat &embimage,
 
 // ─── Paths ─────────────────────────────────────────────────────────────────
 static const std::string DB_PATH       = "object_db.csv";
-static const std::string ONNX_PATH     = "or2d-normmodel-007.onnx";
+static const std::string ONNX_PATH     = "resnet18-v2-7.onnx";
 static const std::string ROI_DIR       = "roi_training";
 static const std::string EIGEN_PREFIX  = "eigen";
 static const std::string CNN_DB_PATH   = "cnn_db.csv";
@@ -68,7 +68,7 @@ static int   MORPH_CLOSE_R   = 4;
 static int   MORPH_OPEN_R    = 3;
 static int   BLUR_KSIZE      = 5;
 static float UNKNOWN_THRESH  = 6.0f;
-static int   THRESH_BIAS     = 0;
+static int   THRESH_BIAS     = 20;       // manual bias added to auto threshold
 
 // ─── CNN embedding DB ──────────────────────────────────────────────────────
 struct CNNEntry {
@@ -202,6 +202,16 @@ cv::Mat prepROI(cv::Mat &frame, const RegionFeatures &feat)
     return embImage;
 }
 
+// ─── Flush OpenCV key buffer after terminal input ──────────────────────────
+// When the user types in the terminal, OpenCV may also capture those
+// keystrokes.  Call this after every std::getline to consume stale keys.
+void flushKeys()
+{
+    // consume any buffered key events
+    for (int i = 0; i < 20; i++)
+        cv::waitKey(1);
+}
+
 // ─── Usage ─────────────────────────────────────────────────────────────────
 void printUsage(const char *prog)
 {
@@ -217,7 +227,7 @@ void printUsage(const char *prog)
       << "\nKey bindings:\n"
       << "  q       quit\n"
       << "  n       train hand-crafted features\n"
-      << "  c       toggle continuous classification\n"
+      << "  z       toggle continuous classification\n"
       << "  g       ground-truth evaluation (confusion matrix)\n"
       << "  p       print confusion matrix\n"
       << "  r       reset confusion matrix\n"
@@ -405,6 +415,7 @@ int main(int argc, char *argv[])
         else if (key == 'n') {
             if (res.regionFeatures.empty()) { std::cout << "No region.\n"; continue; }
             std::cout << "Label: "; std::string label; std::getline(std::cin, label);
+            flushKeys();
             if (!label.empty()) {
                 auto fv = res.regionFeatures[0].getFeatureVector();
                 classifier.addEntry(label, fv);
@@ -413,7 +424,7 @@ int main(int argc, char *argv[])
                 std::cout << "DB: " << classifier.size() << " entries.\n";
             }
         }
-        else if (key == 'c') {
+        else if (key == 'z') {
             classifyMode = !classifyMode;
             std::cout << "Classification " << (classifyMode ? "ON" : "OFF") << "\n";
         }
@@ -441,6 +452,7 @@ int main(int argc, char *argv[])
             std::cout << "Predicted: " << predicted << " (d=" << dist << ")\n";
             std::cout << "True label (enter=accept): ";
             std::string tl; std::getline(std::cin, tl);
+            flushKeys();
             if (tl.empty()) tl = predicted;
             classifier.recordResult(tl, predicted);
         }
@@ -450,6 +462,7 @@ int main(int argc, char *argv[])
         else if (key == 'w') {
             if (res.regionFeatures.empty()) { std::cout << "No region.\n"; continue; }
             std::cout << "ROI label: "; std::string label; std::getline(std::cin, label);
+            flushKeys();
             if (label.empty()) continue;
             cv::Mat roi = prepROI(frame, res.regionFeatures[0]);
             if (!roi.empty()) {
@@ -469,6 +482,7 @@ int main(int argc, char *argv[])
             if (!hasDNN) { std::cout << "DNN not loaded.\n"; continue; }
             if (res.regionFeatures.empty()) { std::cout << "No region.\n"; continue; }
             std::cout << "CNN label: "; std::string label; std::getline(std::cin, label);
+            flushKeys();
             if (label.empty()) continue;
             cv::Mat roi = prepROI(frame, res.regionFeatures[0]);
             if (!roi.empty()) {

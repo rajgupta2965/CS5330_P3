@@ -124,7 +124,7 @@ private:
     SourceMode sourceMode = NONE;
 
     // Parameters
-    int threshBias   = 0;
+    int threshBias   = 20;
     int closeRadius  = 4;
     int openRadius   = 3;
     int minArea      = 800;

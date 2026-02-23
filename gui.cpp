@@ -31,7 +31,7 @@
 namespace fs = std::filesystem;
 
 static const std::string DB_PATH      = "object_db.csv";
-static const std::string ONNX_PATH    = "or2d-normmodel-007.onnx";
+static const std::string ONNX_PATH    = "resnet18-v2-7.onnx";
 static const std::string ROI_DIR      = "roi_training";
 static const std::string EIGEN_PREFIX = "eigen";
 static const std::string CNN_DB_PATH  = "cnn_db.csv";

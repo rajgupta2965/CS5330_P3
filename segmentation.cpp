@@ -128,8 +128,11 @@ cv::Mat connectedComponents(const cv::Mat &binary,
             if (c < minC[id]) minC[id] = c;
             if (c > maxC[id]) maxC[id] = c;
 
-            // Check border
-            if (r == 0 || r == rows - 1 || c == 0 || c == cols - 1)
+            // Check border — use a margin of 8 pixels to catch
+            // regions that were eroded away from the true edge
+            int margin = 8;
+            if (r < margin || r >= rows - margin ||
+                c < margin || c >= cols - margin)
                 border[id] = true;
         }
     }
@@ -181,7 +184,7 @@ cv::Mat filterRegions(const cv::Mat &labelMap,
         if (rs.area < minArea) continue;
         if (removeBorder && rs.touchesBorder) continue;
         // Skip regions larger than 40% of image (background clutter)
-        if (rs.area > imageArea * 0.4) continue;
+        if (rs.area > imageArea * 0.40) continue;
 
         double dx = rs.centroidX - imgCx;
         double dy = rs.centroidY - imgCy;
