@@ -204,9 +204,9 @@ void drawLabel(cv::Mat &display, const RegionFeatures &feat,
 {
     int baseline = 0;
     cv::Size textSz = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX,
-                                       0.8, 2, &baseline);
+                                       3.0, 5, &baseline);
     cv::Point org(cvRound(feat.centroidX) - textSz.width / 2,
-                  cvRound(feat.centroidY) - 20);
+                  cvRound(feat.centroidY) - 40);
 
     // Background rectangle for readability
     cv::rectangle(display,
@@ -215,5 +215,5 @@ void drawLabel(cv::Mat &display, const RegionFeatures &feat,
                   cv::Scalar(0, 0, 0), cv::FILLED);
 
     cv::putText(display, label, org, cv::FONT_HERSHEY_SIMPLEX,
-                0.8, colour, 2);
+                3.0, colour, 5);
 }

@@ -114,7 +114,7 @@ This project generates two main executable files, each with a specific role:
 - Both eigenspace (PCA) and CNN (ResNet18) embedding methods were implemented for one-shot classification (Task 9), with comparative evaluation.
 
 ## Time Travel Days
-0 days used.
+3 days used.
 
 ## Videos
 [Insert link to demo video]
