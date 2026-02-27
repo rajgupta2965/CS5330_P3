@@ -117,7 +117,8 @@ This project generates two main executable files, each with a specific role:
 3 days used.
 
 ## Videos
-**Google Drive Link: https://drive.google.com/file/d/1W-ve_jZqCAEpJYs-T56vFMFhPxUU_AvP/view?usp=sharing**
+**Google Drive Link: https://drive.google.com/file/d/1W-ve_jZqCAEpJYs-T56vFMFhPxUU_AvP/view?usp=sharing**  
+
 **Panopto Link: https://northeastern.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=cd177581-4d19-4323-82dd-b3fe003270ac**
 
 ## Acknowledgements

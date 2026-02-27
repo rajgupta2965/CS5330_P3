@@ -1,4 +1,12 @@
 /*
+Name: Sangeeth Deleep Menon | NUID: 002524579
+Course: CS5330; Pattern Recognition and Computer Vision | Section: 03 | CRN: 40669 | Online
+
+Name: Raj Gupta | NUID: 002068701
+Course: CS5330; Pattern Recognition and Computer Vision | Section: 01 | CRN: 38745 | Online
+*/
+
+/*
 segmentation.h
   CS 5330 - Project 3
   Custom connected-components analysis written from scratch

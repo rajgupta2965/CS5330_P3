@@ -218,7 +218,8 @@ Six out of eight objects (cable, carabiner, gloves, key, pen, pouch) were classi
 
 ## Task 8: Video of Working Pipelines
 
-**Google Drive Link: https://drive.google.com/file/d/1W-ve_jZqCAEpJYs-T56vFMFhPxUU_AvP/view?usp=sharing**
+**Google Drive Link: https://drive.google.com/file/d/1W-ve_jZqCAEpJYs-T56vFMFhPxUU_AvP/view?usp=sharing**  
+
 **Panopto Link: https://northeastern.hosted.panopto.com/Panopto/Pages/Viewer.aspx?id=cd177581-4d19-4323-82dd-b3fe003270ac**
 
 ## Task 9: One-Shot Classification with Embeddings
