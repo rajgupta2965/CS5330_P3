@@ -27,13 +27,13 @@ The executable supports several input modes:
 ./cmake-build-debug/Project3
 
 # Single image
-./cmake-build-debug/Project3 -i path/to/image.png
+./cmake-build-debug/Project3 -i images/cable.jpg
 
 # Directory of images
-./cmake-build-debug/Project3 -d Proj03Examples/
+./cmake-build-debug/Project3 -d images/
 
 # Video file
-./cmake-build-debug/Project3 -v recording.mp4
+./cmake-build-debug/Project3 -v images/pen.mp4
 ```
 
 ### GUI Application
