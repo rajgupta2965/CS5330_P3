@@ -5,7 +5,7 @@
 - **Raj Gupta** | NUID: 002068701 | MSCS - Boston | CS5330 Section 01 (CRN: 38745, Online)
 
 ## Project Description
-This project implements a real-time 2-D object recognition system that identifies objects placed on a white surface in a translation-, scale-, and rotation-invariant manner. The system supports webcam, single image, image directory, and video input modes. All four core pipeline stages — thresholding, morphological filtering, connected components analysis, and moment/orientation computation — are written **from scratch** without using OpenCV built-in functions. Classification is performed using hand-crafted features (Hu moment invariants), eigenspace (PCA) embeddings, and CNN (ResNet18) embeddings.
+This project implements a real-time 2-D object recognition system that identifies objects placed on a white surface in a translation-, scale-, and rotation-invariant manner. The system supports webcam, single image, image directory, and video input modes. All four core pipeline stages: thresholding, morphological filtering, connected components analysis, and moment/orientation computation are written **from scratch** without using OpenCV built-in functions. Classification is performed using hand-crafted features (Hu moment invariants), eigenspace (PCA) embeddings, and CNN (ResNet18) embeddings.
 
 ## Building the Project
 This project uses CMake and requires OpenCV (with `dnn` module) and optionally Qt for the GUI. A C++17 compatible compiler is required.
@@ -81,16 +81,16 @@ This project generates two main executable files, each with a specific role:
     *   **Purpose**: The interactive application with a full Qt desktop window. It provides buttons, dropdowns, sliders, and dialog boxes for all pipeline operations — no keyboard shortcuts needed. Includes a dark theme and live parameter adjustment.
 
 ## Methods Overview
-| Task | Stage | Implementation |
-|------|-------|---------------|
-| 1. Thresholding | HSV saturation+value scoring | **From scratch** — ISODATA (K=2 k-means) adaptive threshold |
-| 2. Morphological Filtering | Closing → Opening cleanup | **From scratch** — Erosion/dilation with circular structuring element |
-| 3. Connected Components | Region segmentation | **From scratch** — Two-pass algorithm with union-find (8-connectivity) |
+| Task | Stage | Implementation                                                           |
+|------|-------|--------------------------------------------------------------------------|
+| 1. Thresholding | HSV saturation+value scoring | **From scratch** — ISODATA (K=2 k-means) adaptive threshold              |
+| 2. Morphological Filtering | Closing → Opening cleanup | **From scratch** — Erosion/dilation with circular structuring element    |
+| 3. Connected Components | Region segmentation | **From scratch** — Two-pass algorithm with union-find (8-connectivity)   |
 | 4. Feature Computation | Moments, orientation, Hu invariants | **From scratch** — Raw/central/normalized moments, oriented bounding box |
-| 5–6. Training & Classification | Scaled Euclidean nearest-neighbour | CSV-based object DB with per-feature std dev normalization |
-| 7. Confusion Matrix | Performance evaluation | 5×5 matrix with accuracy reporting |
-| 9a. Eigenspace Embedding | PCA one-shot classification | SVD-based eigenspace build, project, SSD nearest-neighbour |
-| 9b. CNN Embedding | ResNet18 one-shot classification | ONNX model embedding, SSD nearest-neighbour |
+| 5–6. Training & Classification | Scaled Euclidean nearest-neighbour | CSV-based object DB with per-feature std dev normalization               |
+| 7. Confusion Matrix | Performance evaluation | 8x8 matrix with accuracy reporting                                       |
+| 9a. Eigenspace Embedding | PCA one-shot classification | SVD-based eigenspace build, project, SSD nearest-neighbour               |
+| 9b. CNN Embedding | ResNet18 one-shot classification | ONNX model embedding, SSD nearest-neighbour                              |
 
 ## Project Files
 | File | Description |
@@ -117,7 +117,7 @@ This project generates two main executable files, each with a specific role:
 3 days used.
 
 ## Videos
-[Insert link to demo video]
+**Link:**
 
 ## Acknowledgements
 - OpenCV documentation for image I/O and DNN module references

@@ -330,13 +330,13 @@ The sidebar includes grouped controls for source selection (webcam, image, direc
 
 **5. GUI - Save Screenshot and Print Confusion Matrix**  
 
-<img src="images/gui/SS_Confusion.png" width="500">  
+<img src="images/gui/SS_Confusion2.png" width="500">  
 
 ## 2. All Four Pipeline Stages From Scratch
 
 All four core stages of the pipeline were implemented from scratch without using any OpenCV built-in functions for these operations. Specifically: ISODATA adaptive thresholding with custom HSV-based scoring, erosion and dilation with circular structuring elements, two-pass connected components with union-find and 8-connectivity, and full moment computation including raw, central, normalised central moments, orientation, oriented bounding box, and all seven Hu moment invariants. OpenCV was used only for basic utilities like image I/O, colour space conversion, and Gaussian blur.
 
-## 3. Both Embedding Methods
+## 3. Both Embedding Methods Implemented (Eigenspace and CNN)
 
 Both the eigenspace (PCA) and CNN (ResNet18) embedding methods were implemented for one-shot classification as described in Task 9, with comparative evaluation showing the strengths and weaknesses of each approach.
 
@@ -344,18 +344,16 @@ Both the eigenspace (PCA) and CNN (ResNet18) embedding methods were implemented 
 ## Time Travel Days
 3 days used.
 
-
 ## Reflection
 
 This project was a thorough exercise in building a complete computer vision pipeline from the ground up. Implementing each stage from scratch, rather than calling a single OpenCV function, forced a deep understanding of what these algorithms actually do and why they work. For instance, writing the connected components algorithm made it clear why the two-pass approach with union-find is efficient, and implementing Hu moments revealed how higher-order moment invariants achieve rotation independence through careful combinations of normalized central moments.
 
-The comparison between the three classification methods was the most interesting part. It was surprising that simple hand-crafted features (just 9 numbers) matched the CNN's accuracy on this dataset, while the eigenspace with its pixel-level analysis performed so poorly. This reinforced the idea that choosing the right features matters more than having more features, and that data-driven methods like PCA need sufficient training data to be useful.
+The comparison between the three classification methods was the most interesting part. It was surprising that simple hand-crafted features (just 9 numbers) matched the CNN's accuracy on the training images, while the eigenspace with its pixel-level analysis performed so poorly at 37.5%. This reinforced the idea that choosing the right features matters more than having more features, and that data-driven methods like PCA need sufficient training data to be useful. The confusion matrix evaluation further revealed that hand-crafted features, while strong at 87.5%, struggle with visually similar objects like the wallet and gloves that share similar fill ratios and aspect ratios.
 
-Working with the thresholding also highlighted how much the rest of the pipeline depends on getting that first step right. Objects like the chisel, which has both a dark metal blade and a light wooden handle, required careful threshold tuning to capture the full shape. When only part of the object was detected, the features changed dramatically, leading to misclassification. This kind of cascading error is something that is easy to overlook when using pre-built library functions.
-
+Working with the thresholding also highlighted how much the rest of the pipeline depends on getting that first step right. Objects like the key, which has a light brass color, and the sticky note, which is bright yellow, required the HSV-based scoring approach to be captured properly. The key is detected through its moderate saturation, while the sticky note is captured primarily through its high saturation despite having a high value (brightness) that would make it hard to detect with simple intensity thresholding alone. When only part of an object was detected, the features changed dramatically, leading to misclassification. The choice of objects also mattered, having several predominantly dark objects with similar fill ratios and aspect ratios (wallet, pouch, gloves) in the set made classification more challenging and provided a realistic test of the system's limits.
 
 ## Acknowledgements
 
 *   **Professor Bruce Maxwell** and the course materials for CS5330, which provided the project specification, utilities.cpp, embedding.py, and the ResNet18 ONNX model.
-*   **OpenCV Documentation:** For references on image I/O, colour space conversion, Gaussian blur, and the DNN module.
+*   **OpenCV Documentation:** For references on image I/O, color space conversion, Gaussian blur, and the DNN module.
 *   **An AI assistant (Claude):** Was used to help write and debug code, implement the Qt GUI, and for project documentation.
